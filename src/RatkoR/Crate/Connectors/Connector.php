@@ -69,12 +69,14 @@ class Connector extends BaseConnector implements ConnectorInterface {
     {
         $host = isset($config['host']) ? $config['host'] : 'localhost';
         $port = isset($config['port']) ? (int)$config['port'] : 4200;
+        $database = isset($config['database']) ? $config['database'] : 'doc';
+
         $randomHosts = isset($config['randomHosts']) ? $config['randomHosts'] : true;
 
         if (strpos($host,",") !== false)
-            return $this->getMultipleHostsDsn($host, $port, $randomHosts);
+            return $this->getMultipleHostsDsn($host, $port, $randomHosts,$database);
 
-        return "crate:{$host}:{$port}";
+        return "crate:{$host}:{$port}/{$database}";
     }
 
     /**
@@ -87,7 +89,7 @@ class Connector extends BaseConnector implements ConnectorInterface {
      * @param  int   $defaultPort Default port as stated in config['port'] (or 4200)
      * @return string dsn string
      */
-    protected function getMultipleHostsDsn($hostList, $defaultPort, $randomize)
+    protected function getMultipleHostsDsn($hostList, $defaultPort, $randomize,$database)
     {
         $hosts = explode(',',$hostList);
 
@@ -99,7 +101,7 @@ class Connector extends BaseConnector implements ConnectorInterface {
             shuffle($hosts);
         }
 
-        return 'crate:'.implode(',',$hosts);
+        return 'crate:'.implode(',',$hosts).'/'.$database;
     }
 
     /**
